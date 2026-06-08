@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Oroscopo del Giorno</title>
+  <meta name="theme-color" content="#0a0118"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="apple-touch-icon" href="icon-192.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lato:wght@300;400&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      background: radial-gradient(ellipse at 20% 10%, #1a0533 0%, #0a0118 40%, #000008 100%);
+      color: #e8e0f0;
+      font-family: 'Lato', sans-serif;
+      min-height: 100vh;
+    }
+    #root { min-height: 100vh; }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.2; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.4); }
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 20px #8844aa44; }
+      50% { box-shadow: 0 0 50px #8844aaaa; }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .stella {
+      position: fixed;
+      border-radius: 50%;
+      background: white;
+      animation: twinkle ease-in-out infinite;
+      pointer-events: none;
+    }
+    .segno-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 1rem 0.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      color: #e8e0f0;
+    }
+    .segno-card:hover {
+      transform: translateY(-6px) scale(1.04);
+    }
+    .btn-torna {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.13);
+      color: #9988bb;
+      padding: 0.4rem 1rem;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      letter-spacing: 0.05em;
+      margin-bottom: 1.5rem;
+      transition: all 0.2s;
+      font-family: 'Lato', sans-serif;
+    }
+    .btn-torna:hover { border-color: #8844aa; color: #e8c96f; }
+    .orb {
+      width: 60px; height: 60px;
+      border-radius: 50%;
+      background: conic-gradient(#8844aa, #4488cc, #cc4488, #8844aa);
+      animation: spin 1.5s linear infinite, pulse 2s ease-in-out infinite;
+    }
+    .lettura { animation: fadeIn 0.6s ease; }
+    .stelle-rating span { font-size: 1.1rem; }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script>
+  try { screen.orientation.unlock(); } catch(e) {}
+</script>
+<script type="text/babel">
+const SEGNI = [
+  { nome: "Ariete",     simbolo: "♈", date: "21 mar – 19 apr", elemento: "Fuoco",  colore: "#FF4444" },
+  { nome: "Toro",       simbolo: "♉", date: "20 apr – 20 mag", elemento: "Terra",  colore: "#C8A02A" },
+  { nome: "Gemelli",    simbolo: "♊", date: "21 mag – 20 giu", elemento: "Aria",   colore: "#FFD700" },
+  { nome: "Cancro",     simbolo: "♋", date: "21 giu – 22 lug", elemento: "Acqua",  colore: "#4488CC" },
+  { nome: "Leone",      simbolo: "♌", date: "23 lug – 22 ago", elemento: "Fuoco",  colore: "#FF8800" },
+  { nome: "Vergine",    simbolo: "♍", date: "23 ago – 22 set", elemento: "Terra",  colore: "#66AA44" },
+  { nome: "Bilancia",   simbolo: "♎", date: "23 set – 22 ott", elemento: "Aria",   colore: "#DD88CC" },
+  { nome: "Scorpione",  simbolo: "♏", date: "23 ott – 21 nov", elemento: "Acqua",  colore: "#8844AA" },
+  { nome: "Sagittario", simbolo: "♐", date: "22 nov – 21 dic", elemento: "Fuoco",  colore: "#CC4422" },
+  { nome: "Capricorno", simbolo: "♑", date: "22 dic – 19 gen", elemento: "Terra",  colore: "#7799AA" },
+  { nome: "Acquario",   simbolo: "♒", date: "20 gen – 18 feb", elemento: "Aria",   colore: "#22AADD" },
+  { nome: "Pesci",      simbolo: "♓", date: "19 feb – 20 mar", elemento: "Acqua",  colore: "#7766BB" },
+];
+
+var STELLE_BG = [];
+for (var i = 0; i < 120; i++) {
+  STELLE_BG.push({
+    id: i,
+    x: Math.random() * 100,
+    y: Math.random() * 100,
+    size: Math.random() * 2.5 + 0.5,
+    delay: Math.random() * 4,
+    duration: Math.random() * 3 + 2,
+  });
+}
+
+function getToday() {
+  var d = new Date();
+  return d.toLocaleDateString("it-IT", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+}
+
+function cacheKey(nome) {
+  var d = new Date();
+  var iso = d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+  return "oroscopo_" + nome + "_" + iso;
+}
+
+function StelleSfondo() {
+  return React.createElement("div", { style: { position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none" } },
+    STELLE_BG.map(function(s) {
+      return React.createElement("div", {
+        key: s.id,
+        className: "stella",
+        style: {
+          left: s.x + "%", top: s.y + "%",
+          width: s.size, height: s.size,
+          animationDelay: s.delay + "s",
+          animationDuration: s.duration + "s",
+        }
+      });
+    })
+  );
+}
+
+function RatingStelle(props) {
+  var items = [];
+  for (var i = 0; i < 5; i++) {
+    items.push(React.createElement("span", { key: i, style: { color: i < props.n ? "#FFD700" : "#333" } }, "★"));
+  }
+  return React.createElement("div", { className: "stelle-rating" }, items);
+}
+
+function App() {
+  var stateRef = React.useRef({ segno: null, oroscopo: null, fase: "selezione", loading: false, error: null });
+  var [, forceUpdate] = React.useState(0);
+  var rerender = function() { forceUpdate(function(n) { return n + 1; }); };
+
+  function setStato(updates) {
+    Object.assign(stateRef.current, updates);
+    rerender();
+  }
+
+  var stato = stateRef.current;
+
+  function generaOroscopo(segno) {
+    var key = cacheKey(segno.nome);
+    var cached = localStorage.getItem(key);
+    if (cached) {
+      try {
+        setStato({ oroscopo: JSON.parse(cached), fase: "lettura", loading: false });
+        return;
+      } catch(e) {}
+    }
+
+    setStato({ loading: true, error: null });
+
+    fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1000,
+        system: "Sei un'astrologa mistica e poetica di nome Cassandra. Scrivi oroscopi quotidiani in italiano con tono evocativo, ricco di metafore stellari e planetarie. Rispondi SOLO in JSON valido, senza backtick né testo aggiuntivo.",
+        messages: [{
+          role: "user",
+          content: "Genera l'oroscopo di oggi (" + getToday() + ") per il segno " + segno.nome + " (elemento: " + segno.elemento + ").\nRispondi con questo JSON esatto:\n{\"titolo\":\"frase poetica max 12 parole\",\"generale\":\"paragrafo principale 3-4 frasi\",\"amore\":\"lettura amore 2 frasi\",\"lavoro\":\"lettura lavoro 2 frasi\",\"benessere\":\"lettura benessere 2 frasi\",\"consiglio\":\"consiglio mistico 1 frase\",\"pianeta\":\"pianeta dominante\",\"fortuna\":3,\"stelle\":4}"
+        }]
+      })
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      var text = "";
+      if (data.content) {
+        for (var i = 0; i < data.content.length; i++) {
+          if (data.content[i].type === "text") { text = data.content[i].text; break; }
+        }
+      }
+      var clean = text.replace(/```json|```/g, "").trim();
+      var parsed = JSON.parse(clean);
+      localStorage.setItem(key, JSON.stringify(parsed));
+      setStato({ oroscopo: parsed, fase: "lettura", loading: false });
+    })
+    .catch(function() {
+      setStato({ loading: false, error: "Le stelle tacciono per un momento… riprova tra poco." });
+    });
+  }
+
+  function selezionaSegno(segno) {
+    setStato({ segno: segno });
+    generaOroscopo(segno);
+  }
+
+  function torna() {
+    setStato({ fase: "selezione", oroscopo: null, error: null });
+  }
+
+  return React.createElement("div", { style: { minHeight: "100vh", position: "relative" } },
+    React.createElement(StelleSfondo, null),
+
+    React.createElement("div", { style: { position: "relative", zIndex: 1, maxWidth: 860, margin: "0 auto", padding: "2rem 1.5rem 4rem" } },
+
+      // Header
+      React.createElement("header", { style: { textAlign: "center", marginBottom: "2.5rem" } },
+        React.createElement("div", { style: { fontSize: "2.5rem", marginBottom: "0.5rem" } }, "🌙"),
+        React.createElement("h1", { style: {
+          fontFamily: "'Cinzel', serif", fontSize: "clamp(2rem,6vw,3.5rem)", fontWeight: 700,
+          letterSpacing: "0.3em", margin: 0,
+          background: "linear-gradient(135deg, #e8c96f, #c884e8, #84b8e8)",
+          WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text"
+        } }, "OROSCOPO"),
+        React.createElement("p", { style: { fontFamily: "'Cinzel',serif", fontSize: "0.8rem", letterSpacing: "0.15em", color: "#9988bb", margin: "0.4rem 0 0.2rem", textTransform: "capitalize" } }, getToday()),
+        React.createElement("p", { style: { fontSize: "0.85rem", color: "#665577", fontStyle: "italic", letterSpacing: "0.1em" } }, "Le stelle rivelano il cammino")
+      ),
+
+      // Selezione segni
+      stato.fase === "selezione" && React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(120px,1fr))", gap: "0.8rem" } },
+        SEGNI.map(function(s) {
+          return React.createElement("button", {
+            key: s.nome,
+            className: "segno-card",
+            onClick: function() { selezionaSegno(s); },
+            onMouseEnter: function(e) {
+              e.currentTarget.style.borderColor = s.colore;
+              e.currentTarget.style.boxShadow = "0 8px 30px " + s.colore + "55";
+            },
+            onMouseLeave: function(e) {
+              e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)";
+              e.currentTarget.style.boxShadow = "none";
+            }
+          },
+            React.createElement("span", { style: { fontSize: "1.8rem", color: s.colore, lineHeight: 1 } }, s.simbolo),
+            React.createElement("span", { style: { fontFamily: "'Cinzel',serif", fontSize: "0.75rem", fontWeight: 600, letterSpacing: "0.08em" } }, s.nome),
+            React.createElement("span", { style: { fontSize: "0.6rem", color: "#9988bb" } }, s.date)
+          );
+        })
+      ),
+
+      // Loading
+      stato.loading && React.createElement("div", { style: { display: "flex", flexDirection: "column", alignItems: "center", gap: "1.5rem", padding: "4rem 0" } },
+        React.createElement("div", { className: "orb" }),
+        React.createElement("p", { style: { fontFamily: "'Cinzel',serif", fontSize: "0.9rem", letterSpacing: "0.15em", color: "#9988bb", fontStyle: "italic" } }, "Cassandra consulta le stelle…")
+      ),
+
+      // Errore
+      stato.error && React.createElement("div", { style: { textAlign: "center", padding: "3rem" } },
+        React.createElement("p", { style: { color: "#ffaaaa", marginBottom: "1rem" } }, stato.error),
+        React.createElement("button", { className: "btn-torna", onClick: torna }, "← Torna")
+      ),
+
+      // Lettura
+      stato.fase === "lettura" && stato.oroscopo && !stato.loading && React.createElement("div", { className: "lettura" },
+        React.createElement("button", { className: "btn-torna", onClick: torna }, "← Cambia segno"),
+
+        // Header segno
+        React.createElement("div", { style: {
+          display: "flex", alignItems: "center", gap: "1.2rem", flexWrap: "wrap",
+          background: "rgba(255,255,255,0.04)", border: "1px solid " + (stato.segno ? stato.segno.colore : "#888"),
+          borderRadius: "16px", padding: "1.2rem 1.5rem", marginBottom: "1.5rem"
+        } },
+          React.createElement("span", { style: { fontSize: "3rem", color: stato.segno ? stato.segno.colore : "#888", lineHeight: 1 } }, stato.segno ? stato.segno.simbolo : ""),
+          React.createElement("div", null,
+            React.createElement("h2", { style: { fontFamily: "'Cinzel',serif", fontSize: "1.6rem", fontWeight: 700, margin: 0 } }, stato.segno ? stato.segno.nome : ""),
+            React.createElement("p", { style: { fontSize: "0.8rem", color: "#9988bb", margin: "0.2rem 0 0" } }, stato.segno ? stato.segno.elemento + " · " + stato.segno.date : "")
+          ),
+          React.createElement("div", { style: { marginLeft: "auto", textAlign: "right" } },
+            React.createElement("div", { style: { fontSize: "0.65rem", color: "#665577", letterSpacing: "0.1em", textTransform: "uppercase" } }, "Fortuna"),
+            React.createElement(RatingStelle, { n: stato.oroscopo.fortuna }),
+            React.createElement("div", { style: { fontSize: "0.65rem", color: "#665577", letterSpacing: "0.1em", textTransform: "uppercase", marginTop: "0.3rem" } }, "Stelle"),
+            React.createElement(RatingStelle, { n: stato.oroscopo.stelle })
+          )
+        ),
+
+        React.createElement("p", { style: { fontFamily: "'Cinzel',serif", fontSize: "1.1rem", fontStyle: "italic", textAlign: "center", color: "#e8c96f", margin: "0 0 1rem", letterSpacing: "0.05em" } }, "\u201C" + stato.oroscopo.titolo + "\u201D"),
+
+        stato.oroscopo.pianeta && React.createElement("p", { style: { textAlign: "center", fontSize: "0.85rem", color: "#9988bb", marginBottom: "1.2rem" } },
+          "🪐 Pianeta dominante: ", React.createElement("strong", null, stato.oroscopo.pianeta)
+        ),
+
+        React.createElement("div", { style: {
+          background: "rgba(255,255,255,0.04)", borderLeft: "3px solid #8844aa",
+          borderRadius: "0 12px 12px 0", padding: "1rem 1.2rem",
+          fontSize: "0.95rem", lineHeight: 1.75, color: "#d8d0e8", marginBottom: "1.5rem"
+        } }, stato.oroscopo.generale),
+
+        React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: "0.8rem", marginBottom: "1.5rem" } },
+          [
+            { icon: "💕", label: "Amore", testo: stato.oroscopo.amore },
+            { icon: "💼", label: "Lavoro", testo: stato.oroscopo.lavoro },
+            { icon: "🌿", label: "Benessere", testo: stato.oroscopo.benessere },
+          ].map(function(s) {
+            return React.createElement("div", { key: s.label, style: {
+              background: "rgba(255,255,255,0.04)", borderRadius: "12px",
+              padding: "1rem", border: "1px solid rgba(255,255,255,0.06)"
+            } },
+              React.createElement("div", { style: { fontSize: "1.3rem", marginBottom: "0.3rem" } }, s.icon),
+              React.createElement("h4", { style: { fontFamily: "'Cinzel',serif", fontSize: "0.75rem", letterSpacing: "0.12em", color: "#c884e8", margin: "0 0 0.5rem", textTransform: "uppercase" } }, s.label),
+              React.createElement("p", { style: { fontSize: "0.85rem", lineHeight: 1.65, color: "#b8b0c8", margin: 0 } }, s.testo)
+            );
+          })
+        ),
+
+        React.createElement("div", { style: {
+          display: "flex", alignItems: "flex-start", gap: "0.8rem",
+          background: "linear-gradient(135deg,#1a0a2e,#0a1a2e)",
+          border: "1px solid rgba(136,68,170,0.27)", borderRadius: "12px", padding: "1rem 1.2rem"
+        } },
+          React.createElement("span", { style: { fontSize: "1.2rem", flexShrink: 0, marginTop: "0.1rem" } }, "✨"),
+          React.createElement("p", { style: { fontStyle: "italic", fontSize: "0.9rem", lineHeight: 1.7, color: "#e8c96f", margin: 0 } }, stato.oroscopo.consiglio)
+        )
+      )
+    )
+  );
+}
+
+var root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(React.createElement(App, null));
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' })
+      .catch(function(e) { console.log('SW error:', e); });
+  });
+}
+</script>
+</body>
+</html>
