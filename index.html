@@ -21,61 +21,79 @@
       min-height: 100vh;
     }
     #root { min-height: 100vh; }
-    @keyframes twinkle {
-      0%,100%{opacity:.2;transform:scale(1);}50%{opacity:1;transform:scale(1.4);}
-    }
-    @keyframes spin {from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
-    @keyframes pulse {
-      0%,100%{box-shadow:0 0 20px #8844aa44;}50%{box-shadow:0 0 50px #8844aaaa;}
-    }
-    @keyframes fadeIn {
-      from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}
-    }
-    .stella {
-      position:fixed;border-radius:50%;background:white;
-      animation:twinkle ease-in-out infinite;pointer-events:none;
-    }
+
+    @keyframes twinkle  { 0%,100%{opacity:.2;transform:scale(1);}50%{opacity:1;transform:scale(1.4);} }
+    @keyframes spin     { from{transform:rotate(0deg);}to{transform:rotate(360deg);} }
+    @keyframes pulse    { 0%,100%{box-shadow:0 0 20px #8844aa44;}50%{box-shadow:0 0 50px #8844aaaa;} }
+    @keyframes fadeIn   { from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);} }
+    @keyframes floatUp  { from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);} }
+
+    .stella { position:fixed; border-radius:50%; background:white; animation:twinkle ease-in-out infinite; pointer-events:none; }
     .segno-card {
-      background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);
-      border-radius:12px;padding:1rem .5rem;display:flex;flex-direction:column;
-      align-items:center;gap:.4rem;cursor:pointer;transition:all .25s ease;color:#e8e0f0;
+      background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.08);
+      border-radius:12px; padding:1rem .5rem; display:flex; flex-direction:column;
+      align-items:center; gap:.4rem; cursor:pointer; transition:all .25s ease; color:#e8e0f0;
     }
-    .segno-card:hover{transform:translateY(-6px) scale(1.04);}
+    .segno-card:hover { transform:translateY(-6px) scale(1.04); }
     .btn {
-      background:transparent;border:1px solid rgba(255,255,255,.13);color:#9988bb;
-      padding:.4rem 1rem;border-radius:20px;cursor:pointer;font-size:.8rem;
-      letter-spacing:.05em;transition:all .2s;font-family:'Lato',sans-serif;
+      background:transparent; border:1px solid rgba(255,255,255,.13); color:#9988bb;
+      padding:.4rem 1rem; border-radius:20px; cursor:pointer; font-size:.8rem;
+      letter-spacing:.05em; transition:all .2s; font-family:'Lato',sans-serif;
     }
-    .btn:hover{border-color:#8844aa;color:#e8c96f;}
-    .btn-primary {
-      background:linear-gradient(135deg,#8844aa,#4455cc);border:none;color:white;
-      padding:.7rem 1.8rem;border-radius:24px;cursor:pointer;font-size:.9rem;
-      letter-spacing:.08em;font-family:'Cinzel',serif;transition:all .2s;
-    }
-    .btn-primary:hover{opacity:.85;transform:translateY(-2px);}
+    .btn:hover { border-color:#8844aa; color:#e8c96f; }
     .orb {
-      width:60px;height:60px;border-radius:50%;
+      width:60px; height:60px; border-radius:50%;
       background:conic-gradient(#8844aa,#4488cc,#cc4488,#8844aa);
       animation:spin 1.5s linear infinite, pulse 2s ease-in-out infinite;
     }
-    .lettura{animation:fadeIn .6s ease;}
-    .stelle-rating span{font-size:1.1rem;}
-    input[type=text], input[type=password] {
-      width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);
-      border-radius:10px;padding:.7rem 1rem;color:#e8e0f0;font-size:.9rem;
-      font-family:'Lato',sans-serif;outline:none;transition:border-color .2s;
+    .lettura { animation:fadeIn .6s ease; }
+    .stelle-rating span { font-size:1.1rem; }
+
+    /* Login card */
+    .login-card {
+      background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1);
+      border-radius:20px; padding:2.5rem 2rem; text-align:center;
+      max-width:380px; margin:0 auto;
+      animation:floatUp .7s ease;
     }
-    input[type=text]:focus, input[type=password]:focus{border-color:#8844aa;}
-    input[type=text]::placeholder, input[type=password]::placeholder{color:#665577;}
+    .btn-google {
+      display:flex; align-items:center; justify-content:center; gap:.8rem;
+      background:white; color:#1a1a2e; border:none; border-radius:12px;
+      padding:.85rem 2rem; font-size:.95rem; font-weight:600; cursor:pointer;
+      width:100%; transition:all .2s; font-family:'Lato',sans-serif;
+      box-shadow:0 4px 20px rgba(0,0,0,.4);
+    }
+    .btn-google:hover { transform:translateY(-2px); box-shadow:0 8px 30px rgba(0,0,0,.5); }
+    .btn-google svg { flex-shrink:0; }
+    .avatar { width:36px; height:36px; border-radius:50%; border:2px solid #8844aa; }
   </style>
 </head>
 <body>
 <div id="root"></div>
+
+<!-- Firebase compat -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<!-- React + Babel -->
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <script>try{screen.orientation.unlock();}catch(e){}</script>
+
+<script>
+firebase.initializeApp({
+  apiKey:    "AIzaSyDue3aMzi-8-zflMvlgdGp1TzzId1CZNaI",
+  authDomain:"viaggi-camper.firebaseapp.com",
+  projectId: "viaggi-camper",
+  appId:     "1:172431561795:web:ae6ef3e9c2bbdfeb2d70f6"
+});
+var db   = firebase.firestore();
+var auth = firebase.auth();
+</script>
+
 <script type="text/babel">
+/* ── dati segni ────────────────────────────────────────────── */
 var SEGNI = [
   {nome:"Ariete",    simbolo:"♈",date:"21 mar – 19 apr",elemento:"Fuoco", colore:"#FF4444"},
   {nome:"Toro",      simbolo:"♉",date:"20 apr – 20 mag",elemento:"Terra", colore:"#C8A02A"},
@@ -91,12 +109,14 @@ var SEGNI = [
   {nome:"Pesci",     simbolo:"♓",date:"19 feb – 20 mar",elemento:"Acqua", colore:"#7766BB"},
 ];
 
-var STELLE_BG = [];
-for(var i=0;i<120;i++){
-  STELLE_BG.push({id:i,x:Math.random()*100,y:Math.random()*100,
-    size:Math.random()*2.5+.5,delay:Math.random()*4,duration:Math.random()*3+2});
-}
+/* ── stelle sfondo ──────────────────────────────────────────── */
+var BG_STARS = [];
+for(var _i=0;_i<120;_i++) BG_STARS.push({
+  id:_i, x:Math.random()*100, y:Math.random()*100,
+  size:Math.random()*2.5+.5, delay:Math.random()*4, dur:Math.random()*3+2
+});
 
+/* ── helpers ───────────────────────────────────────────────── */
 function getToday(){
   return new Date().toLocaleDateString("it-IT",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
 }
@@ -104,115 +124,122 @@ function getDateKey(){
   var d=new Date();
   return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
 }
-function cacheKey(nome){return "oroscopo_"+nome+"_"+getDateKey();}
+function oroKey(nome){ return "oro_"+nome+"_"+getDateKey(); }
 
-// ────────────────────────────────────────────
-// Sfondo stellato
-// ────────────────────────────────────────────
+/* ── StelleSfondo ───────────────────────────────────────────── */
 function StelleSfondo(){
   return React.createElement("div",{style:{position:"fixed",inset:0,zIndex:0,pointerEvents:"none"}},
-    STELLE_BG.map(function(s){
+    BG_STARS.map(function(s){
       return React.createElement("div",{key:s.id,className:"stella",style:{
         left:s.x+"%",top:s.y+"%",width:s.size,height:s.size,
-        animationDelay:s.delay+"s",animationDuration:s.duration+"s"
+        animationDelay:s.delay+"s",animationDuration:s.dur+"s"
       }});
     })
   );
 }
 
+/* ── RatingStelle ───────────────────────────────────────────── */
 function RatingStelle(props){
   var items=[];
   for(var i=0;i<5;i++) items.push(React.createElement("span",{key:i,style:{color:i<props.n?"#FFD700":"#333"}},"★"));
   return React.createElement("div",{className:"stelle-rating"},items);
 }
 
-// ────────────────────────────────────────────
-// Schermata setup chiave API
-// ────────────────────────────────────────────
-function SetupApiKey(props){
-  var ref = React.useRef(null);
-  var [visible, setVisible] = React.useState(false);
-  var [errore, setErrore] = React.useState("");
+/* ── Google logo SVG ────────────────────────────────────────── */
+var GoogleLogo = React.createElement("svg",{width:20,height:20,viewBox:"0 0 48 48"},
+  React.createElement("path",{fill:"#FFC107",d:"M43.6 20H24v8h11.3C33.6 33.1 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34 6.5 29.3 4.5 24 4.5 12.7 4.5 3.5 13.7 3.5 25S12.7 45.5 24 45.5c11.1 0 20.5-8.5 20.5-20.5 0-1.4-.1-2.7-.4-5z"}),
+  React.createElement("path",{fill:"#FF3D00",d:"M6.3 14.7l6.6 4.8C14.5 15.3 18.9 12 24 12c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34 6.5 29.3 4.5 24 4.5c-7.7 0-14.3 4.4-17.7 10.2z"}),
+  React.createElement("path",{fill:"#4CAF50",d:"M24 45.5c5.2 0 9.9-1.9 13.5-5.1l-6.2-5.2C29.3 37.1 26.8 38 24 38c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.7 41.3 16.3 45.5 24 45.5z"}),
+  React.createElement("path",{fill:"#1976D2",d:"M43.6 20H24v8h11.3c-.8 2.3-2.3 4.3-4.2 5.7l6.2 5.2C40.9 35.6 44 30.7 44 25c0-1.4-.1-2.7-.4-5z"})
+);
 
-  function salva(){
-    var val = ref.current ? ref.current.value.trim() : "";
-    if(!val || val.length < 10){ setErrore("Chiave non valida."); return; }
-    localStorage.setItem("gemini_api_key", val);
-    props.onSaved(val);
+/* ── LoginScreen ────────────────────────────────────────────── */
+function LoginScreen(props){
+  var [busy, setBusy] = React.useState(false);
+  var [err,  setErr]  = React.useState("");
+
+  function login(){
+    setBusy(true); setErr("");
+    var provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider).catch(function(e){
+      setErr("Accesso annullato o non riuscito."); setBusy(false);
+    });
   }
 
-  return React.createElement("div",{style:{maxWidth:440,margin:"0 auto",padding:"2rem 1rem"}},
-    React.createElement("div",{style:{textAlign:"center",marginBottom:"2rem"}},
-      React.createElement("div",{style:{fontSize:"3rem",marginBottom:".5rem"}},"🔑"),
-      React.createElement("h2",{style:{fontFamily:"'Cinzel',serif",fontSize:"1.3rem",letterSpacing:".15em",
-        background:"linear-gradient(135deg,#e8c96f,#c884e8)",WebkitBackgroundClip:"text",
-        WebkitTextFillColor:"transparent",backgroundClip:"text",marginBottom:".5rem"}},
-        "CONFIGURA L'APP"),
-      React.createElement("p",{style:{fontSize:".85rem",color:"#9988bb",lineHeight:1.6}},
-        "L'app usa Google Gemini AI — gratuito e senza carta di credito."),
+  return React.createElement("div",{style:{position:"relative",zIndex:1,padding:"2rem 1.5rem"}},
+    React.createElement("header",{style:{textAlign:"center",marginBottom:"3rem"}},
+      React.createElement("div",{style:{fontSize:"3rem",marginBottom:".6rem"}},"🌙"),
+      React.createElement("h1",{style:{fontFamily:"'Cinzel',serif",fontSize:"clamp(2rem,6vw,3rem)",
+        fontWeight:700,letterSpacing:".3em",margin:0,
+        background:"linear-gradient(135deg,#e8c96f,#c884e8,#84b8e8)",
+        WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text"}},"OROSCOPO"),
+      React.createElement("p",{style:{fontSize:".85rem",color:"#665577",fontStyle:"italic",
+        letterSpacing:".1em",marginTop:".4rem"}},"Le stelle rivelano il cammino")
     ),
-
-    React.createElement("div",{style:{background:"rgba(255,255,255,.04)",border:"1px solid rgba(255,255,255,.1)",
-      borderRadius:16,padding:"1.5rem",marginBottom:"1.2rem"}},
-      React.createElement("p",{style:{fontFamily:"'Cinzel',serif",fontSize:".7rem",letterSpacing:".12em",
-        color:"#c884e8",textTransform:"uppercase",marginBottom:"1rem"}},
-        "Come ottenere la chiave gratuita"),
-      ["1. Vai su aistudio.google.com","2. Accedi con un account Google","3. Clicca \"Get API key\" → \"Create API key\"","4. Copia la chiave e incollala qui sotto"].map(function(t,i){
-        return React.createElement("p",{key:i,style:{fontSize:".82rem",color:"#b8b0c8",lineHeight:1.7,
-          paddingLeft:"1rem",borderLeft:"2px solid #8844aa44",marginBottom:".4rem"}},t);
-      })
-    ),
-
-    React.createElement("div",{style:{marginBottom:"1rem",position:"relative"}},
-      React.createElement("input",{
-        ref:ref, type:visible?"text":"password",
-        placeholder:"Incolla qui la tua API key (AIza...)",
-        style:{paddingRight:"3rem"},
-        onKeyDown:function(e){if(e.key==="Enter")salva();}
-      }),
-      React.createElement("button",{
-        onClick:function(){setVisible(!visible)},
-        style:{position:"absolute",right:"10px",top:"50%",transform:"translateY(-50%)",
-          background:"none",border:"none",color:"#9988bb",cursor:"pointer",fontSize:"1rem"}
-      }, visible ? "🙈" : "👁")
-    ),
-
-    errore && React.createElement("p",{style:{color:"#ffaaaa",fontSize:".8rem",marginBottom:".8rem",textAlign:"center"}},errore),
-
-    React.createElement("button",{className:"btn-primary",onClick:salva,style:{width:"100%"}},
-      "Salva e inizia ✨"),
-
-    React.createElement("p",{style:{fontSize:".72rem",color:"#443355",textAlign:"center",marginTop:"1rem",lineHeight:1.5}},
-      "La chiave è salvata solo sul tuo dispositivo (localStorage). Non viene mai inviata ad altri server.")
+    React.createElement("div",{className:"login-card"},
+      React.createElement("p",{style:{fontSize:"1.1rem",marginBottom:".5rem",fontFamily:"'Cinzel',serif",
+        letterSpacing:".1em",color:"#e8c96f"}},"Benvenuto"),
+      React.createElement("p",{style:{fontSize:".88rem",color:"#9988bb",lineHeight:1.65,marginBottom:"2rem"}},"Accedi con il tuo account Google per scoprire cosa dicono le stelle oggi."),
+      busy
+        ? React.createElement("div",{style:{display:"flex",justifyContent:"center"}},React.createElement("div",{className:"orb"}))
+        : React.createElement("button",{className:"btn-google",onClick:login},GoogleLogo,"Accedi con Google"),
+      err && React.createElement("p",{style:{color:"#ffaaaa",fontSize:".8rem",marginTop:"1rem"}},err)
+    )
   );
 }
 
-// ────────────────────────────────────────────
-// App principale
-// ────────────────────────────────────────────
+/* ── App principale ─────────────────────────────────────────── */
 function App(){
-  var [apiKey, setApiKey] = React.useState(function(){ return localStorage.getItem("gemini_api_key")||""; });
+  /* auth state */
+  var [authState, setAuthState] = React.useState("loading"); // loading | out | in
+  var [user,      setUser]      = React.useState(null);
+  var [geminiKey, setGeminiKey] = React.useState("");
+
+  /* oroscopo state (ref per evitare problemi Babel closure) */
   var stRef = React.useRef({segno:null,oroscopo:null,fase:"selezione",loading:false,error:null});
   var [,fU] = React.useState(0);
   var re = function(){ fU(function(n){return n+1;}); };
-
   function set(u){ Object.assign(stRef.current,u); re(); }
   var st = stRef.current;
 
-  function generaOroscopo(segno){
-    var key = cacheKey(segno.nome);
-    var cached = localStorage.getItem(key);
-    if(cached){
-      try{ set({oroscopo:JSON.parse(cached),fase:"lettura",loading:false}); return; }catch(e){}
-    }
+  /* ascolta auth */
+  React.useEffect(function(){
+    var unsub = auth.onAuthStateChanged(function(u){
+      if(u){
+        setUser(u); setAuthState("in");
+        /* recupera chiave Gemini da Firestore */
+        db.collection("config").doc("gemini").get().then(function(snap){
+          if(snap.exists){ setGeminiKey(snap.data().key||""); }
+        });
+      } else {
+        setUser(null); setAuthState("out"); setGeminiKey("");
+      }
+    });
+    return function(){ unsub(); };
+  }, []);
+
+  function logout(){
+    auth.signOut();
+    set({segno:null,oroscopo:null,fase:"selezione",loading:false,error:null});
+  }
+
+  function generaOroscopo(segno, key){
+    var ckey = oroKey(segno.nome);
+    var cached = localStorage.getItem(ckey);
+    if(cached){ try{ set({oroscopo:JSON.parse(cached),fase:"lettura",loading:false}); return; }catch(e){} }
     set({loading:true,error:null});
 
-    var prompt = "Genera l'oroscopo di oggi ("+getToday()+") per il segno "+segno.nome+" (elemento: "+segno.elemento+"). "+
-      "Sei un'astrologa mistica di nome Cassandra. Scrivi in italiano con tono evocativo e poetico. "+
-      "Rispondi SOLO con questo JSON esatto, senza backtick né testo aggiuntivo:\n"+
-      "{\"titolo\":\"frase poetica max 12 parole\",\"generale\":\"paragrafo 3-4 frasi\","+
+    var apiKey = key || geminiKey;
+    if(!apiKey){ set({loading:false,error:"Chiave API non disponibile."}); return; }
+
+    var prompt = "Genera l'oroscopo di oggi ("+getToday()+") per il segno "+segno.nome+
+      " (elemento: "+segno.elemento+"). "+
+      "Sei Cassandra, astrologa mistica. Scrivi in italiano, tono evocativo e poetico. "+
+      "Rispondi SOLO con JSON valido, senza backtick né altro testo:\n"+
+      "{\"titolo\":\"frase poetica max 12 parole\",\"generale\":\"3-4 frasi\","+
       "\"amore\":\"2 frasi\",\"lavoro\":\"2 frasi\",\"benessere\":\"2 frasi\","+
-      "\"consiglio\":\"1 frase mistica\",\"pianeta\":\"pianeta dominante\",\"fortuna\":3,\"stelle\":4}";
+      "\"consiglio\":\"1 frase mistica\",\"pianeta\":\"pianeta dominante\","+
+      "\"fortuna\":3,\"stelle\":4}";
 
     fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key="+apiKey,{
       method:"POST",
@@ -222,59 +249,64 @@ function App(){
     })
     .then(function(r){ return r.json(); })
     .then(function(data){
-      var text = "";
-      try{ text = data.candidates[0].content.parts[0].text; }catch(e){}
-      var clean = text.replace(/```json|```/g,"").trim();
-      var parsed = JSON.parse(clean);
-      localStorage.setItem(key, JSON.stringify(parsed));
+      var text="";
+      try{ text=data.candidates[0].content.parts[0].text; }catch(e){}
+      if(!text && data.error){ throw new Error(data.error.message||"API error"); }
+      var parsed = JSON.parse(text.replace(/```json|```/g,"").trim());
+      localStorage.setItem(ckey, JSON.stringify(parsed));
       set({oroscopo:parsed,fase:"lettura",loading:false});
     })
     .catch(function(e){
-      var msg = "Le stelle tacciono… riprova tra poco.";
-      if(e && e.message && e.message.indexOf("401")!==-1) msg="Chiave API non valida. Controlla le impostazioni.";
-      set({loading:false,error:msg});
+      set({loading:false,error:"Le stelle tacciono… riprova tra poco."});
     });
   }
 
   function selezionaSegno(segno){ set({segno:segno}); generaOroscopo(segno); }
   function torna(){ set({fase:"selezione",oroscopo:null,error:null}); }
-  function resetKey(){ localStorage.removeItem("gemini_api_key"); setApiKey(""); }
 
-  // Nessuna chiave → setup
-  if(!apiKey){
-    return React.createElement("div",{style:{minHeight:"100vh",position:"relative"}},
+  /* ── loading iniziale ── */
+  if(authState==="loading"){
+    return React.createElement("div",{style:{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",position:"relative"}},
       React.createElement(StelleSfondo,null),
-      React.createElement("div",{style:{position:"relative",zIndex:1}},
-        React.createElement("header",{style:{textAlign:"center",padding:"2.5rem 1rem 1.5rem"}},
-          React.createElement("h1",{style:{fontFamily:"'Cinzel',serif",fontSize:"clamp(1.8rem,5vw,3rem)",fontWeight:700,
-            letterSpacing:".3em",margin:0,background:"linear-gradient(135deg,#e8c96f,#c884e8,#84b8e8)",
-            WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text"}},"OROSCOPO"),
-          React.createElement("p",{style:{fontSize:".8rem",color:"#665577",fontStyle:"italic",marginTop:".3rem"}},"Le stelle rivelano il cammino")
-        ),
-        React.createElement(SetupApiKey,{onSaved:function(k){setApiKey(k);}})
+      React.createElement("div",{style:{position:"relative",zIndex:1,textAlign:"center"}},
+        React.createElement("div",{className:"orb",style:{margin:"0 auto"}}),
+        React.createElement("p",{style:{marginTop:"1.5rem",fontFamily:"'Cinzel',serif",fontSize:".85rem",
+          letterSpacing:".15em",color:"#9988bb",fontStyle:"italic"}},"Le stelle si allineano…")
       )
     );
   }
 
-  // App con chiave
+  /* ── login ── */
+  if(authState==="out"){
+    return React.createElement("div",{style:{minHeight:"100vh",position:"relative"}},
+      React.createElement(StelleSfondo,null),
+      React.createElement(LoginScreen,null)
+    );
+  }
+
+  /* ── app ── */
   return React.createElement("div",{style:{minHeight:"100vh",position:"relative"}},
     React.createElement(StelleSfondo,null),
     React.createElement("div",{style:{position:"relative",zIndex:1,maxWidth:860,margin:"0 auto",padding:"2rem 1.5rem 4rem"}},
 
+      /* header */
       React.createElement("header",{style:{textAlign:"center",marginBottom:"2.5rem",position:"relative"}},
         React.createElement("div",{style:{fontSize:"2.5rem",marginBottom:".5rem"}},"🌙"),
-        React.createElement("h1",{style:{fontFamily:"'Cinzel',serif",fontSize:"clamp(2rem,6vw,3.5rem)",fontWeight:700,
-          letterSpacing:".3em",margin:0,background:"linear-gradient(135deg,#e8c96f,#c884e8,#84b8e8)",
+        React.createElement("h1",{style:{fontFamily:"'Cinzel',serif",fontSize:"clamp(2rem,6vw,3.5rem)",
+          fontWeight:700,letterSpacing:".3em",margin:0,
+          background:"linear-gradient(135deg,#e8c96f,#c884e8,#84b8e8)",
           WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text"}},"OROSCOPO"),
         React.createElement("p",{style:{fontFamily:"'Cinzel',serif",fontSize:".8rem",letterSpacing:".15em",
           color:"#9988bb",margin:".4rem 0 .2rem",textTransform:"capitalize"}},getToday()),
         React.createElement("p",{style:{fontSize:".85rem",color:"#665577",fontStyle:"italic",letterSpacing:".1em"}},"Le stelle rivelano il cammino"),
-        React.createElement("button",{className:"btn",onClick:resetKey,
-          style:{position:"absolute",right:0,top:0,fontSize:".7rem",padding:".3rem .7rem"}},
-          "⚙️ Chiave")
+        /* avatar + logout */
+        React.createElement("div",{style:{position:"absolute",right:0,top:0,display:"flex",alignItems:"center",gap:".5rem"}},
+          user && user.photoURL && React.createElement("img",{src:user.photoURL,className:"avatar",alt:""}),
+          React.createElement("button",{className:"btn",onClick:logout,style:{fontSize:".7rem",padding:".3rem .7rem"}},"Esci")
+        )
       ),
 
-      // Griglia segni
+      /* griglia segni */
       st.fase==="selezione" && React.createElement("div",{style:{display:"grid",
         gridTemplateColumns:"repeat(auto-fill,minmax(120px,1fr))",gap:".8rem"}},
         SEGNI.map(function(s){
@@ -290,22 +322,23 @@ function App(){
         })
       ),
 
-      // Loading
+      /* loading */
       st.loading && React.createElement("div",{style:{display:"flex",flexDirection:"column",alignItems:"center",gap:"1.5rem",padding:"4rem 0"}},
         React.createElement("div",{className:"orb"}),
         React.createElement("p",{style:{fontFamily:"'Cinzel',serif",fontSize:".9rem",letterSpacing:".15em",color:"#9988bb",fontStyle:"italic"}},"Cassandra consulta le stelle…")
       ),
 
-      // Errore
+      /* errore */
       st.error && React.createElement("div",{style:{textAlign:"center",padding:"3rem"}},
         React.createElement("p",{style:{color:"#ffaaaa",marginBottom:"1rem"}},st.error),
         React.createElement("button",{className:"btn",onClick:torna},"← Torna")
       ),
 
-      // Lettura
+      /* lettura */
       st.fase==="lettura" && st.oroscopo && !st.loading && React.createElement("div",{className:"lettura"},
         React.createElement("button",{className:"btn",onClick:torna,style:{marginBottom:"1.5rem"}},"← Cambia segno"),
 
+        /* header segno */
         React.createElement("div",{style:{display:"flex",alignItems:"center",gap:"1.2rem",flexWrap:"wrap",
           background:"rgba(255,255,255,.04)",border:"1px solid "+(st.segno?st.segno.colore:"#888"),
           borderRadius:16,padding:"1.2rem 1.5rem",marginBottom:"1.5rem"}},
