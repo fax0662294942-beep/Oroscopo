@@ -161,9 +161,7 @@ function LoginScreen(props){
   function login(){
     setBusy(true); setErr("");
     var provider = new firebase.auth.GoogleAuthProvider();
-    auth.signInWithPopup(provider).catch(function(e){
-      setErr("Accesso annullato o non riuscito."); setBusy(false);
-    });
+    auth.signInWithRedirect(provider);
   }
 
   return React.createElement("div",{style:{position:"relative",zIndex:1,padding:"2rem 1.5rem"}},
@@ -202,12 +200,14 @@ function App(){
   function set(u){ Object.assign(stRef.current,u); re(); }
   var st = stRef.current;
 
-  /* ascolta auth */
+  /* ascolta auth + gestisce redirect result */
   React.useEffect(function(){
+    /* controlla se stiamo tornando da un redirect Google */
+    auth.getRedirectResult().catch(function(){});
+
     var unsub = auth.onAuthStateChanged(function(u){
       if(u){
         setUser(u); setAuthState("in");
-        /* recupera chiave Gemini da Firestore */
         db.collection("config").doc("gemini").get().then(function(snap){
           if(snap.exists){ setGeminiKey(snap.data().key||""); }
         });
