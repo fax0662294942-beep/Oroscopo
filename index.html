@@ -161,7 +161,14 @@ function LoginScreen(props){
   function login(){
     setBusy(true); setErr("");
     var provider = new firebase.auth.GoogleAuthProvider();
-    auth.signInWithRedirect(provider);
+    auth.signInWithPopup(provider).catch(function(e){
+      console.error("Login error:", e.code, e.message);
+      var msg = "Accesso non riuscito.";
+      if(e.code === "auth/popup-blocked")      msg = "Popup bloccato dal browser. Prova ad aprire il link direttamente (non da un'altra app).";
+      if(e.code === "auth/unauthorized-domain") msg = "Dominio non autorizzato in Firebase. Controlla le impostazioni.";
+      if(e.code === "auth/popup-closed-by-user") msg = "Accesso annullato.";
+      setErr(msg); setBusy(false);
+    });
   }
 
   return React.createElement("div",{style:{position:"relative",zIndex:1,padding:"2rem 1.5rem"}},
@@ -200,11 +207,8 @@ function App(){
   function set(u){ Object.assign(stRef.current,u); re(); }
   var st = stRef.current;
 
-  /* ascolta auth + gestisce redirect result */
+  /* ascolta auth */
   React.useEffect(function(){
-    /* controlla se stiamo tornando da un redirect Google */
-    auth.getRedirectResult().catch(function(){});
-
     var unsub = auth.onAuthStateChanged(function(u){
       if(u){
         setUser(u); setAuthState("in");
